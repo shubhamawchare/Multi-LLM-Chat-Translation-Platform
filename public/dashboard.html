@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Multi-LLM Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .current-time-widget {
+            text-align: right;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .current-time {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .recent-activity {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Dashboard Header with Welcome and Time -->
+        <div class="dashboard-header">
+            <div class="header-content">
+                <div class="welcome-section">
+                    <div class="user-info">
+                        <h1 id="userName">Welcome back!</h1>
+                        <div class="user-details">
+                            <span>📧 <span id="userEmail">Loading...</span></span>
+                            <span>📋 <span id="userPlan">Free Plan</span></span>
+                            <span>🗓️ Joined <span id="joinDate">Recently</span></span>
+                        </div>
+                    </div>
+                    <div class="current-time-widget">
+                        <div class="current-time time-only"></div>
+                        <div class="current-date date-only"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <span id="tokensRemaining" class="stat-number">0</span>
+                <span class="stat-label">Tokens Remaining</span>
+            </div>
+            <div class="stat-card">
+                <span id="prebuiltCount" class="stat-number">0</span>
+                <span class="stat-label">Available Content</span>
+            </div>
+            <div class="stat-card">
+                <span id="customCount" class="stat-number">0</span>
+                <span class="stat-label">Custom Items</span>
+            </div>
+            <div class="stat-card">
+                <span id="advancedCount" class="stat-number">0</span>
+                <span class="stat-label">Transformations</span>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-content">
+            <!-- Sections Grid -->
+            <div class="sections-container">
+                <div class="sections-grid">
+                    <div class="section-card" data-section="prebuilt">
+                        <span class="section-icon">📚</span>
+                        <h3 class="section-title">Prebuilt Content</h3>
+                        <p class="section-description">Ready-to-use templates, guides, and resources</p>
+                        <div id="prebuiltCount" class="section-count">Loading...</div>
+                    </div>
+
+                    <div class="section-card" data-section="bookmarks">
+                        <span class="section-icon">🔖</span>
+                        <h3 class="section-title">Your Bookmarks</h3>
+                        <p class="section-description">Saved content and favorite items</p>
+                        <div id="bookmarksCount" class="section-count">Loading...</div>
+                    </div>
+
+                    <div class="section-card" data-section="custom">
+                        <span class="section-icon">✨</span>
+                        <h3 class="section-title">Custom Content</h3>
+                        <p class="section-description">Your AI-generated content and creations</p>
+                        <div id="customCount" class="section-count">Loading...</div>
+                    </div>
+
+                    <div class="section-card" data-section="advanced">
+                        <span class="section-icon">🚀</span>
+                        <h3 class="section-title">Advanced Features</h3>
+                        <p class="section-description">Transformations and advanced AI operations</p>
+                        <div id="advancedCount" class="section-count">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Recent Activity -->
+                <div class="recent-activity">
+                    <div class="activity-header">
+                        <h3>Recent Activity</h3>
+                        <button id="refreshDashboard" class="refresh-btn" title="Refresh Dashboard">
+                            🔄
+                        </button>
+                    </div>
+                    <div id="recentActivity">
+                        <div class="no-activity">Loading recent activity...</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a href="/" class="action-btn" id="quickChat">
+                            <span>💬</span>
+                            <span>Start Chat</span>
+                        </a>
+                        <a href="/translate" class="action-btn" id="quickTranslate">
+                            <span>🌐</span>
+                            <span>Translate Text</span>
+                        </a>
+                        <a href="/profile-setup" class="action-btn">
+                            <span>⚙️</span>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="universal-auth.js"></script>
+    <script src="dashboard.js"></script>
+    </body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Language Translator - Multi-LLM</title>
+    <!-- Point to the css folder -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">🌐</div>
+                <div>
+                    <h1>AI Language Translator</h1>
+                    <small class="brand-subtitle">Powered by Multiple AI Models</small>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <a href="/" class="nav-link">
+                    <span>💬</span>
+                    Chat
+                </a>
+                <a href="/translate" class="nav-link active">
+                    <span>🌐</span>
+                    Translator
+                </a>
+            </div>
+
+            <!-- Model Selector -->
+            <div class="model-selector">
+                <button class="model-button" id="modelBtn">
+                    <span id="currentModel">Select AI Model</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="model-dropdown" id="modelDropdown">
+                    <div class="dropdown-loading">Loading models...</div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="header-actions">
+                <a href="/" class="btn btn--outline">Back to Chat</a>
+                <button class="action-btn" id="settingsBtn" title="Settings">⚙️</button>
+            </div>
+        </header>
+
+        <!-- Main Translator Interface -->
+        <main class="translator-main">
+            <div class="translator-container">
+                <!-- Language Selection Bar -->
+                <div class="language-bar">
+                    <div class="language-selector">
+                        <select class="language-select" id="sourceLangSelect">
+                            <option value="auto">Detect Language</option>
+                        </select>
+                        <div class="language-label">From</div>
+                    </div>
+
+                    <button class="swap-languages-btn" id="swapBtn" title="Swap Languages">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18"/>
+                        </svg>
+                    </button>
+
+                    <div class="language-selector">
+                        <select class="language-select" id="targetLangSelect">
+                            <option value="en">English</option>
+                        </select>
+                        <div class="language-label">To</div>
+                    </div>
+                </div>
+
+                <!-- Translation Area -->
+                <div class="translation-area">
+                    <!-- Source Text Area -->
+                    <div class="text-area-container source">
+                        <div class="text-area-header">
+                            <div class="detected-language" id="detectedLang" style="display: none;">
+                                <span class="detect-label">Detected:</span>
+                                <span class="detect-value">-</span>
+                            </div>
+                            <div class="char-count">
+                                <span id="sourceCharCount">0</span> / 5000
+                            </div>
+                        </div>
+                        <textarea
+                            class="text-area source-text"
+                            id="sourceText"
+                            placeholder="Enter text to translate..."
+                            maxlength="5000"
+                        ></textarea>
+                        <div class="text-area-actions">
+                            <button class="action-button clear-btn" id="clearSourceBtn" title="Clear text">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2"/>
+                                </svg>
+                            </button>
+                            <button class="action-button paste-btn" id="pasteBtn" title="Paste from clipboard">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                                </svg>
+                            </button>
+                            <button class="action-button mic-btn" id="micBtn" title="Voice input (coming soon)" disabled>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1v6m0 0a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM8 8v3a4 4 0 0 0 8 0V8"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Translate Button -->
+                    <div class="translate-button-container">
+                        <button class="btn btn--primary translate-btn" id="translateBtn">
+                            <span class="translate-text">Translate</span>
+                            <span class="loading-spinner" style="display: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                        <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                        <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                    </circle>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- Target Text Area -->
+                    <div class="text-area-container target">
+                        <div class="text-area-header">
+                            <div class="translation-info" id="translationInfo" style="display: none;">
+                                <span class="info-label">Translated by:</span>
+                                <span class="info-value" id="usedModel">-</span>
+                            </div>
+                            <div class="char-count">
+                                <span id="targetCharCount">0</span> characters
+                            </div>
+                        </div>
+                        <textarea
+                            class="text-area target-text"
+                            id="targetText"
+                            placeholder="Translation will appear here..."
+                            readonly
+                        ></textarea>
+                        <div class="text-area-actions">
+                            <button class="action-button copy-btn" id="copyBtn" title="Copy translation">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                            <button class="action-button share-btn" id="shareBtn" title="Share translation (coming soon)" disabled>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                    <polyline points="16,6 12,2 8,6"/>
+                                    <line x1="12" y1="2" x2="12" y2="15"/>
+                                </svg>
+                            </button>
+                            <button class="action-button speaker-btn" id="speakerBtn" title="Listen to translation (coming soon)" disabled>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                    <path d="M19.07 4.93A10 10 0 0 1 19.07 19.07M15.54 8.46A5 5 0 0 1 15.54 15.54"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Translation History -->
+                <div class="translation-history" id="translationHistory" style="display: none;">
+                    <div class="history-header">
+                        <h3>Recent Translations</h3>
+                        <button class="btn btn--secondary btn--sm" id="clearHistoryBtn">Clear History</button>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <!-- History items will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="translator-footer">
+            <div class="footer-content">
+                <p>
+                    <strong>AI Language Translator</strong> powered by OpenAI, Anthropic, and Deepseek models.
+                    <span class="footer-divider">•</span>
+                    <a href="/" class="footer-link">Back to Chat</a>
+                </p>
+            </div>
+        </footer>
+
+        <!-- Notifications Container -->
+        <div class="notifications-container" id="notifications">
+            <!-- Notifications will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Scripts: point to the js folder -->
+    <script src="js/llmProviders.js"></script>
+    <script src="js/translate-ui.js"></script>
+    <script src="js/translate.js"></script>
+    
+</body>
+</html>
